@@ -35,6 +35,13 @@ class Cafe(db.Model):
 
     @log_decorator
     def manual_dict(self):
+        """
+        manual conversion of object to dict
+
+        grants finer control over dict but needs to be updated with the class
+
+        :return:
+        """
         thedict = {
             "id": self.id,
             "name": self.name,
@@ -54,6 +61,13 @@ class Cafe(db.Model):
     # works
     @log_decorator
     def get_dict(self):
+        """
+        dictionary comprehension as stated in examples
+
+        always returns all fields and keeps itself up to date
+
+        :return:
+        """
         cafe_dict = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         logger.debug(f"dict: {cafe_dict}")
         return cafe_dict
@@ -61,6 +75,11 @@ class Cafe(db.Model):
     # works
     @log_decorator
     def _dict(self):
+        """
+        hack to get dict
+
+        :return:
+        """
         try:
             selfdict = self.__dict__.copy()
             del selfdict['_sa_instance_state']
@@ -72,6 +91,11 @@ class Cafe(db.Model):
     # does not work
     @log_decorator
     def to_dict(self):
+        """
+        does not work: TypeError
+
+        :return:
+        """
         try:
             row_as_dict = dict(self)
             logger.debug(f"row_as_dict: {row_as_dict}")
@@ -82,6 +106,11 @@ class Cafe(db.Model):
     # does not work
     @log_decorator
     def as_dict(self):
+        """
+        does not work: AttributeError
+
+        :return:
+        """
         try:
             asdict = self._asdict()
             print("self._asdict(): ", asdict)
@@ -90,12 +119,10 @@ class Cafe(db.Model):
 
     @log_decorator
     def get_json(self):
+        # cafedict = self.manual_dict()
+        # cafedict = self._dict()
         cafedict = self.get_dict()
-        cafedict = self._dict()
-        cafedict = self.manual_dict()
-        json_cafe = jsonify(
-            cafedict
-        )
+        json_cafe = jsonify(cafedict)
         logger.debug(json_cafe)
         return json_cafe
 
