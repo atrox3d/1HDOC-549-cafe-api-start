@@ -115,16 +115,17 @@ class Cafe(db.Model):
             asdict = self._asdict()
             print("self._asdict(): ", asdict)
             return asdict
-        except AttributeError as ae:     print(ae)
+        except AttributeError as ae:
+            print(ae)
 
-    @log_decorator
-    def get_json(self):
-        # cafedict = self.manual_dict()
-        # cafedict = self._dict()
-        cafedict = self.get_dict()
-        json_cafe = jsonify(cafedict)
-        logger.debug(json_cafe)
-        return json_cafe
+    # @log_decorator
+    # def get_json(self):
+    #     # cafedict = self.manual_dict()
+    #     # cafedict = self._dict()
+    #     cafedict = self.get_dict()
+    #     json_cafe = jsonify(cafedict)
+    #     logger.debug(json_cafe)
+    #     return json_cafe
 
 
 @app.route("/")
@@ -141,7 +142,18 @@ def get_randomcafe():
     cafe = random.choice(cafes)
     logger.debug(cafe)
     # return render_template("index.html")
-    return cafe.get_json()
+    # return cafe.get_json()
+    return jsonify(cafe.get_dict())
+
+
+@app.route("/all", methods=["GET"])
+@log_decorator
+def get_allcafes():
+    cafes = db.session.query(Cafe).all()
+    logger.debug(cafes)
+    # json_cafes = { "cafes": [cafe.get_json() for cafe in cafes] }
+    all_cafes = [cafe.get_dict() for cafe in cafes]
+    return jsonify(all_cafes=all_cafes)
 
 
 ## HTTP GET - Read Record
