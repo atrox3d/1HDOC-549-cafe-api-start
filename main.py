@@ -1,6 +1,14 @@
 from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 
+import util.logging
+from util.logging import log_decorator
+import logging
+
+rootlogger = util.logging.get_root_logger()
+logger = logging.getLogger(__name__)
+
+
 app = Flask(__name__)
 
 ##Connect to Database
@@ -25,6 +33,7 @@ class Cafe(db.Model):
 
 
 @app.route("/")
+@log_decorator
 def home():
     return render_template("index.html")
     
