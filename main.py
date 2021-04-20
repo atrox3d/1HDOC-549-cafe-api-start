@@ -134,7 +134,7 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/random", methods=["GET"])
+@app.route("/random")
 @log_decorator
 def get_randomcafe():
     cafes = db.session.query(Cafe).all()
@@ -146,7 +146,7 @@ def get_randomcafe():
     return jsonify(cafe.get_dict())
 
 
-@app.route("/all", methods=["GET"])
+@app.route("/all")
 @log_decorator
 def get_allcafes():
     cafes = db.session.query(Cafe).all()
@@ -154,6 +154,23 @@ def get_allcafes():
     # json_cafes = { "cafes": [cafe.get_json() for cafe in cafes] }
     all_cafes = [cafe.get_dict() for cafe in cafes]
     return jsonify(all_cafes=all_cafes)
+
+
+@app.route("/search")
+@log_decorator
+def search_cafes():
+    location = request.args.get("location")
+    logger.debug(location)
+    cafes = db.session.query(Cafe).filter_by(location=location)
+    logger.debug(cafes)
+    logger.debug(cafes.count())
+
+    if not cafes.count():
+        return jsonify(error="Fab not Found (check THE BOX)")
+    else:
+        all_cafes = [cafe.get_dict() for cafe in cafes]
+        return jsonify(all_cafes=all_cafes)
+
 
 
 ## HTTP GET - Read Record
