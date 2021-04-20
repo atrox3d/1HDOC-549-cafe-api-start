@@ -27,7 +27,7 @@ ROOTLOGGER = None
 def get_root_logger(format_string=FORMAT_STRING, level=logging.NOTSET) -> logging.Logger:
     global ROOTLOGGER
     if not ROOTLOGGER:
-        logging.basicConfig(level=level, format=format_string)
+        logging.basicConfig(level=level, format=format_string, stream=sys.stdout)
         logger.info("root logger configured.")
         ROOTLOGGER = logging.getLogger()
     return ROOTLOGGER
