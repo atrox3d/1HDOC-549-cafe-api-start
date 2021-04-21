@@ -171,6 +171,13 @@ def search_cafes():
         all_cafes = [cafe.get_dict() for cafe in cafes]
         return jsonify(all_cafes=all_cafes)
 
+# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647241#questions/14644838
+# TODO: install postman, test and document endpoints
+# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions/14644838
+# TODO: implement /add route and create new cafes with postman
+# TODO: OR
+# TODO: use a form instead of postman
+
 
 
 ## HTTP GET - Read Record
