@@ -188,14 +188,14 @@ def search_cafes():
         return jsonify(all_cafes=all_cafes)
 
 ################################################################################
-# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647241#questions/14644838
+# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535#questions
 # TODO: install postman, test and document endpoints
 ################################################################################
 
 ################################################################################
 # HTTP POST - Create Record
 ################################################################################
-# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions/14644838
+# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions
 # TODO: implement /add route and create new cafes with postman
 # TODO: OR
 # TODO: use a form instead of postman
