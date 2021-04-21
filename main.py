@@ -164,6 +164,25 @@ def get_allcafes():
     all_cafes = [cafe.get_dict() for cafe in cafes]
     return jsonify(all_cafes=all_cafes)
 
+################################################################################
+# https://stackoverflow.com/a/6345834
+################################################################################
+# My personal rule of thumb that the PathParam leads upto the entity type
+# that you are requesting.
+#
+# /Invoices             // all invoices
+# /Invoices?after=2011  // a filter on all invoices
+#
+# /Invoices/52          // by 52
+# /Invoices/52/Items    // all items on invoice 52
+# /Invoices/52/Items/1  // Item 1 from invoice 52
+#
+# /Companies/{company}/Invoices?sort=Date
+# /Companies/{company}/Invoices/{invoiceNo} // assuming that the invoice only
+# unq by company?
+# To quote Mr Rowe:
+# Path parameters for grouping data, query parameters for filtering
+################################################################################
 
 @app.route("/search")
 @log_decorator
@@ -187,6 +206,29 @@ def search_cafes():
         all_cafes = [cafe.get_dict() for cafe in cafes]
         return jsonify(all_cafes=all_cafes)
 
+
+@app.route("/search/<location>")
+@log_decorator
+def find_cafes(location):
+    """
+    route to /search/<location>
+
+    restful version of search?
+
+    :param location: part of url
+    :return: json of the matching cafes
+    """
+    logger.debug(f"location: {location}")
+    cafes = db.session.query(Cafe).filter_by(location=location)
+    logger.debug(cafes)
+    logger.debug(f"cafes count: {cafes.count()}")
+
+    if not cafes.count():
+        return jsonify(error=f"{location} not Found (check THE BOX)")
+    else:
+        found_cafes = [cafe.get_dict() for cafe in cafes]
+        return jsonify(matching=found_cafes)
+
 ################################################################################
 # TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535#questions
 # TODO: install postman, test and document endpoints
@@ -204,6 +246,13 @@ def search_cafes():
 ################################################################################
 # HTTP PUT/PATCH - Update Record
 ################################################################################
+@app.route("/update-price/<cafeid>/<price>")
+@log_decorator
+def update_price(cafeid, price):
+    logger.debug(f"cafeid: {cafeid}")
+    logger.debug(f"price : {price}")
+
+    return f"{cafeid}, {price}"
 
 ################################################################################
 # HTTP DELETE - Delete Record
