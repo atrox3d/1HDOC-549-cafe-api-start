@@ -234,20 +234,26 @@ def find_cafes(location):
 
 
 ################################################################################
-# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535#questions
+# DONE: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535#questions
 # DONE: install postman
 # DONE: test endpoints
-# TODO: document endpoints
+# DONE: document endpoints
 ################################################################################
 
 ################################################################################
 # HTTP POST - Create Record
 ################################################################################
 # TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions
-# TODO: implement /add route and create new cafes with postman
-# TODO: OR
-# TODO: use a form instead of postman
+# TODO: implement /add route
+# DONE: create new cafes with postman
+# TODO: OR use a form instead of postman
 ################################################################################
+@app.route("/add", methods=["POST"])
+@log_decorator
+def add_cafe():
+
+    logger.debug(request.form)
+    return request.form, 200
 
 ################################################################################
 # HTTP PUT/PATCH - Update Record
