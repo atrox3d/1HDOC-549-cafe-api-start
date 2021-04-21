@@ -118,37 +118,46 @@ class Cafe(db.Model):
         except AttributeError as ae:
             print(ae)
 
-    # @log_decorator
-    # def get_json(self):
-    #     # cafedict = self.manual_dict()
-    #     # cafedict = self._dict()
-    #     cafedict = self.get_dict()
-    #     json_cafe = jsonify(cafedict)
-    #     logger.debug(json_cafe)
-    #     return json_cafe
-
 
 @app.route("/")
 @log_decorator
 def home():
+    """
+    route to /index.html
+
+    :return:
+    """
     return render_template("index.html")
 
+################################################################################
+#  HTTP GET - Read Record
+################################################################################
 
 @app.route("/random")
 @log_decorator
 def get_randomcafe():
+    """
+    route to /random
+
+    selects a random cafe from db
+
+    :return: json of selected cafe
+    """
     cafes = db.session.query(Cafe).all()
     logger.debug(cafes)
     cafe = random.choice(cafes)
     logger.debug(cafe)
-    # return render_template("index.html")
-    # return cafe.get_json()
     return jsonify(cafe.get_dict())
 
 
 @app.route("/all")
 @log_decorator
 def get_allcafes():
+    """
+    route to /all
+
+    :return: json of all cafes in the db
+    """
     cafes = db.session.query(Cafe).all()
     logger.debug(cafes)
     # json_cafes = { "cafes": [cafe.get_json() for cafe in cafes] }
@@ -159,6 +168,13 @@ def get_allcafes():
 @app.route("/search")
 @log_decorator
 def search_cafes():
+    """
+    route to /search?location=<location>
+
+    searches for a cafe in the db having location==<location>
+
+    :return: json of the matching cafes
+    """
     location = request.args.get("location")
     logger.debug(location)
     cafes = db.session.query(Cafe).filter_by(location=location)
@@ -171,22 +187,27 @@ def search_cafes():
         all_cafes = [cafe.get_dict() for cafe in cafes]
         return jsonify(all_cafes=all_cafes)
 
+################################################################################
 # TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647241#questions/14644838
 # TODO: install postman, test and document endpoints
+################################################################################
+
+################################################################################
+# HTTP POST - Create Record
+################################################################################
 # TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions/14644838
 # TODO: implement /add route and create new cafes with postman
 # TODO: OR
 # TODO: use a form instead of postman
+################################################################################
 
+################################################################################
+# HTTP PUT/PATCH - Update Record
+################################################################################
 
-
-## HTTP GET - Read Record
-
-## HTTP POST - Create Record
-
-## HTTP PUT/PATCH - Update Record
-
-## HTTP DELETE - Delete Record
+################################################################################
+# HTTP DELETE - Delete Record
+################################################################################
 
 
 if __name__ == '__main__':
