@@ -16,6 +16,7 @@ app = Flask(__name__)
 ##Connect to Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cafes.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JSON_SORT_KEYS'] = False
 db = SQLAlchemy(app)
 
 
@@ -129,6 +130,7 @@ def home():
     """
     return render_template("index.html")
 
+
 ################################################################################
 #  HTTP GET - Read Record
 ################################################################################
@@ -163,6 +165,7 @@ def get_allcafes():
     # json_cafes = { "cafes": [cafe.get_json() for cafe in cafes] }
     all_cafes = [cafe.get_dict() for cafe in cafes]
     return jsonify(all_cafes=all_cafes)
+
 
 ################################################################################
 # https://stackoverflow.com/a/6345834
@@ -204,7 +207,7 @@ def search_cafes():
         return jsonify(error="Fab not Found (check THE BOX)")
     else:
         all_cafes = [cafe.get_dict() for cafe in cafes]
-        return jsonify(all_cafes=all_cafes)
+        return jsonify(matching=all_cafes)
 
 
 @app.route("/search/<location>")
@@ -229,9 +232,12 @@ def find_cafes(location):
         found_cafes = [cafe.get_dict() for cafe in cafes]
         return jsonify(matching=found_cafes)
 
+
 ################################################################################
 # TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535#questions
-# TODO: install postman, test and document endpoints
+# DONE: install postman
+# DONE: test endpoints
+# TODO: document endpoints
 ################################################################################
 
 ################################################################################
@@ -253,6 +259,7 @@ def update_price(cafeid, price):
     logger.debug(f"price : {price}")
 
     return f"{cafeid}, {price}"
+
 
 ################################################################################
 # HTTP DELETE - Delete Record
