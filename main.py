@@ -8,7 +8,10 @@ import util.logging
 from util.logging import log_decorator
 import logging
 
-rootlogger = util.logging.get_root_logger()
+rootlogger = util.logging.get_root_logger(
+    format_string='%(asctime)s | %(levelname)-8s | %(name)-15s | %(funcName)20s() | %(message)s'
+
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -251,8 +254,15 @@ def find_cafes(location):
 @app.route("/add", methods=["POST"])
 @log_decorator
 def add_cafe():
-
     logger.debug(request.form)
+    for name, value in request.form.items():
+        logger.debug(f"{name}={value}")
+    cafe_dict = request.form.to_dict()
+    logger.debug(cafe_dict)
+    # same thing
+    cafe = Cafe(**cafe_dict)
+    cafe = Cafe(**request.form.to_dict())
+    logger.debug(cafe)
     return request.form, 200
 
 ################################################################################
