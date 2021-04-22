@@ -25,6 +25,15 @@ ROOTLOGGER = None
 
 
 def get_root_logger(format_string=FORMAT_STRING, level=logging.NOTSET) -> logging.Logger:
+    """
+    invokes basicConfig with format_string and level params
+
+    returns rootlogger
+
+    :param format_string: '%(asctime)s | %(levelname)-8s | %(name)-25s | %(funcName)20s() | %(message)s'
+    :param level: logging.NOTSET
+    :return: rootlogger
+    """
     global ROOTLOGGER
     if not ROOTLOGGER:
         logging.basicConfig(level=level, format=format_string, stream=sys.stdout)
@@ -41,27 +50,33 @@ def get_cli_logger(
         output_stream=sys.stderr,
 ) -> logging.Logger:
     """
-    ########################################################################################################################
-        - GET LOCAL (NON-ROOT) LOGGER INSTANCE THAT OUTPUTS TO CLI
-        - SET LEVEL TO DEBUG (DEFAULT IS WARNING)
-    ########################################################################################################################
+    DEPRECATED
+    
+    creates a new logger with default attributes
+
+    :param name: None
+    :param level: logging.DEBUG
+    :param set_handler: True
+    :param format_string: '%(asctime)s | %(levelname)-8s | %(name)-25s | %(funcName)20s() | %(message)s'
+    :param output_stream: stderr
+    :return: logger
     """
-    _logger = logging.getLogger(name)  # get local logger
-    _logger.setLevel(level)  # set logger level >= logger_level
-    """
-    ########################################################################################################################
-        - GET SAME FORMATTER INSTANCE FOR ALL HANDLERS
-    ########################################################################################################################
-    """
+    ############################################################################
+    #    - GET LOCAL (NON-ROOT) LOGGER INSTANCE THAT OUTPUTS TO CLI
+    #    - SET LEVEL TO DEBUG (DEFAULT IS WARNING)
+    ############################################################################
+    _logger = logging.getLogger(name)   # get local logger
+    _logger.setLevel(level)             # set logger level >= logger_level
+    ############################################################################
+    #    - GET SAME FORMATTER INSTANCE FOR ALL HANDLERS
+    ############################################################################
     format_string = format_string
     formatter = logging.Formatter(format_string)  # get formatter
-    """
-    ########################################################################################################################
-        - GET CLI HANDLER INSTANCE
-        - SET FORMATTER FOR CLI HANDLER INSTANCE
-        - ADD HANDLER TO LOCAL LOGGER
-    ########################################################################################################################
-    """
+    ############################################################################
+    #    - GET CLI HANDLER INSTANCE
+    #    - SET FORMATTER FOR CLI HANDLER INSTANCE
+    #    - ADD HANDLER TO LOCAL LOGGER
+    ############################################################################
     if set_handler and not _logger.hasHandlers():
         if isinstance(output_stream, str):
             # by stream name
@@ -76,28 +91,46 @@ def get_cli_logger(
             print(f"{output_stream} is not a {type(sys.stderr)}")
             output_stream = sys.stderr
 
-        cli_handler = logging.StreamHandler(stream=output_stream)  # get CLI handler (default=stderr)
-        cli_handler.setFormatter(formatter)  # set formatter for CLI handler
-        _logger.addHandler(cli_handler)  # add CLI handler to logger
+        cli_handler = logging.StreamHandler(stream=output_stream)   # get CLI handler (default=stderr)
+        cli_handler.setFormatter(formatter)                         # set formatter for CLI handler
+        _logger.addHandler(cli_handler)                             # add CLI handler to logger
 
     return _logger
 
 
-def list_loggers(condition_name=None, condition_value=None):
+def list_loggers(attribute_name=None, attribute_value=None):
+    """
+    return a list of current loggers
+    
+    if attribute_name and attribute_value are specified,
+    the list is filtered via gerattr
+    
+    :param attribute_name: 
+    :param attribute_value: 
+    :return: [loggers]
+    """
     loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
-    if condition_name:
-        loggers = [_logger for _logger in loggers if getattr(_logger, condition_name) == condition_value]
-    # print(loggers)
+    if attribute_name:
+        loggers = [_logger for _logger in loggers if getattr(_logger, attribute_name) == attribute_value]
     return loggers
 
 
 def list_logger_names():
-    logger_names = [logging.getLogger(name).name for name in logging.root.manager.loggerDict[:]]
-    # print(loggers)
+    """
+    :return: [logger names]
+    """
+    # logger_names = [logging.getLogger(name).name for name in logging.root.manager.loggerDict[:]]
+    logger_names = [logger.name for logger in list_loggers()]
     return logger_names
 
 
 def disable_loggers(*prefixes):
+    """
+    disable all loggers whose name starts with one of the prefixes
+
+    :param prefixes: list of prefixes
+    :return: None
+    """
     for prefix in prefixes:
         for current_logger in list_loggers():
             if current_logger.name.startswith(prefix):
