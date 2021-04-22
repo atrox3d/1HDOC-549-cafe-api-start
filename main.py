@@ -263,7 +263,7 @@ def add_cafe():
     cafe = Cafe(**cafe_dict)
     cafe = Cafe(**request.form.to_dict())
     logger.debug(f"new cafe: {cafe}")
-    return request.form, 200
+    return request.form
 
 ################################################################################
 # HTTP PUT/PATCH - Update Record

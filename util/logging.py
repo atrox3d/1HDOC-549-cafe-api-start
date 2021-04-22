@@ -146,12 +146,40 @@ def list_enabled_loggers():
     return list_loggers("disabled", False)
 
 
+def log_formatdata(name, value):
+    if isinstance(value, tuple):
+        ret = []
+        ret.append(f"{name} <{type(value).__name__}>: (")
+        for item in value:
+            ret.append(f"    {item}")
+        ret.append(")")
+        return ret
+    if isinstance(value, list):
+        ret = []
+        ret.append(f"{name} <{type(value).__name__}>: [")
+        for item in value:
+            ret.append(f"    {item}")
+        ret.append("]")
+        return ret
+    elif isinstance(value, dict):
+        ret = []
+        ret.append(f"{name} <{type(value).__name__}>: {{")
+        for k, v in value.items():
+            ret.append(f"    {k}: {v}")
+        ret.append("}")
+        return ret
+    else:
+        return [f"{name} <{type(value).__name__}>: {value}"]
+
+
 def log_decorator(fn):
     @functools.wraps(fn)
     def wrapper(*args, **kwargs):
         logger.info(f"calling {fn.__name__}({util.params.params2str(*args, **kwargs)})")
         retval = fn(*args, **kwargs)
-        logger.info(f"return value: {retval}")
+        # logger.info(f"return value:")
+        for line in log_formatdata("return value", retval):
+            logger.info(line)
         return retval
 
     return wrapper
