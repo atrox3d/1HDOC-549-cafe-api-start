@@ -259,8 +259,8 @@ def find_cafes(location):
 ################################################################################
 # HTTP POST - Create Record
 ################################################################################
-# TODO: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions
-# TODO: implement /add route
+# DONE: https://www.udemy.com/course/100-days-of-code/learn/lecture/22647101#questions
+# DONE: implement /add route
 # DONE: create new cafes with postman
 # TODO: OR use a form instead of postman
 ################################################################################
@@ -283,17 +283,29 @@ def add_cafe():
     except Exception as e:
         return jsonify(response=dict(error="could not add cafè"))
 
+
 ################################################################################
 # HTTP PUT/PATCH - Update Record
 ################################################################################
-@app.route("/update-price/<cafeid>/<price>")
+# DONE: https://www.udemy.com/course/100-days-of-code/learn/lecture/22653535
+# DONE: implement /update-price
+#
+################################################################################
+@app.route("/update-price/<cafeid>", methods=["PATCH"])
 @log_decorator
-def update_price(cafeid, price):
+def update_price(cafeid):
+    logger.debug(f"method: {request.method}")
     logger.debug(f"cafeid: {cafeid}")
+    price = request.args.get("price")
     logger.debug(f"price : {price}")
-
-    return f"{cafeid}, {price}"
-
+    cafe = db.session.query(Cafe).get(cafeid)
+    logger.debug(cafe)
+    if cafe:
+        cafe.coffee_price = price
+        db.session.commit()
+        return jsonify(result=dict(success=f"succesfully updated cafe id: {cafeid}, newprice={price}")), 200
+    else:
+        return jsonify(error=dict(notfound=f"could not find cafe id: {cafeid}"))
 
 ################################################################################
 # HTTP DELETE - Delete Record
