@@ -38,6 +38,19 @@ class Cafe(db.Model):
     coffee_price = db.Column(db.String(250), nullable=True)
 
     @log_decorator
+    def __init__(self, **kwargs):
+        for col in self.__table__.columns:
+            logger.info(f"{col.name}:{col.type}={getattr(self, col.name)}")
+            if str(col.type) == "BOOLEAN":
+                logger.info("BOOLEAN detected")
+                logger.info(kwargs[col.name])
+                if kwargs[col.name].lower() in [ "true", "1" ]:
+                    kwargs[col.name] = True
+                else:
+                    kwargs[col.name] = False
+        super().__init__(**kwargs)
+
+    @log_decorator
     def manual_dict(self):
         """
         manual conversion of object to dict
@@ -255,15 +268,20 @@ def find_cafes(location):
 @log_decorator
 def add_cafe():
     logger.debug(request.form)
-    for name, value in request.form.items():
-        logger.debug(f"request.form[{name}]={value}")
+    # for name, value in request.form.items():
+    #     logger.debug(f"request.form[{name}]={value}")
     cafe_dict = request.form.to_dict()
     logger.debug(f"request.form.to_dict(): {cafe_dict}")
     # same thing
     cafe = Cafe(**cafe_dict)
     cafe = Cafe(**request.form.to_dict())
     logger.debug(f"new cafe: {cafe}")
-    return request.form
+    db.session.add(cafe)
+    try:
+        db.session.commit()
+        return jsonify(response=dict(success="succesful added the new cafè"))
+    except Exception as e:
+        return jsonify(response=dict(error="could not add cafè"))
 
 ################################################################################
 # HTTP PUT/PATCH - Update Record
