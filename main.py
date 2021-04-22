@@ -9,7 +9,7 @@ from util.logging import log_decorator
 import logging
 
 rootlogger = util.logging.get_root_logger(
-    format_string='%(asctime)s | %(levelname)-8s | %(name)-15s | %(funcName)20s() | %(message)s'
+    format_string='%(asctime)s | %(levelname)-8s | %(name)-15s | %(funcName)15s() | %(message)s'
 
 )
 logger = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class Cafe(db.Model):
         :return:
         """
         cafe_dict = {col.name: getattr(self, col.name) for col in self.__table__.columns}
-        logger.debug(f"dict: {cafe_dict}")
+        logger.debug(f"cafe_dict: {cafe_dict}")
         return cafe_dict
 
     # works
@@ -256,13 +256,13 @@ def find_cafes(location):
 def add_cafe():
     logger.debug(request.form)
     for name, value in request.form.items():
-        logger.debug(f"{name}={value}")
+        logger.debug(f"request.form[{name}]={value}")
     cafe_dict = request.form.to_dict()
-    logger.debug(cafe_dict)
+    logger.debug(f"request.form.to_dict(): {cafe_dict}")
     # same thing
     cafe = Cafe(**cafe_dict)
     cafe = Cafe(**request.form.to_dict())
-    logger.debug(cafe)
+    logger.debug(f"new cafe: {cafe}")
     return request.form, 200
 
 ################################################################################
