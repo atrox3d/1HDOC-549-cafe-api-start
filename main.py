@@ -305,7 +305,7 @@ def update_price(cafeid):
         db.session.commit()
         return jsonify(result=dict(success=f"succesfully updated cafe id: {cafeid}, newprice={price}")), 200
     else:
-        return jsonify(error=dict(notfound=f"could not find cafe id: {cafeid}"))
+        return jsonify(error=dict(notfound=f"could not find cafe id: {cafeid}")), 404
 
 ################################################################################
 # HTTP DELETE - Delete Record
