@@ -33,8 +33,8 @@ def api_call(
     call pixela api, generalized
     """
     print(f"calling request.{http_method.__name__} {endpoint}")
-    if params:
-        print(f"\twith params: {params}")
+    # if params:
+    print(f"\twith params: {params}")
     # authentication via headers, not in the url
     # headers = {"X-USER-TOKEN": token}
     headers = {}
@@ -171,8 +171,25 @@ def get_randomcafe():
     return response
 
 
+def get_allcafes():
+    response = api_call(HTTP_GET, GET_ALLCAFES_ENDPOINT)
+    return response
+
+
+def search_cafes(location, querystring=True):
+    params = dict(location=location)
+    if querystring:
+        response = api_call(HTTP_GET, SEARCH_CAFES_QS_ENDPOINT, params=params)
+    else:
+        url = SEARCH_CAFES_PV_ENDPOINT.format(location)
+        response = api_call(HTTP_GET, url)
+    return response
+
+
 if __name__ == '__main__':
     get_randomcafe()
+    get_allcafes()
+    search_cafes("London Bridge", False)
     pass
     # create_user(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN)
     # create_graph(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN,
