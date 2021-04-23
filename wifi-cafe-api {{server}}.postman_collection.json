@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "78e94336-e566-479a-a4dd-13c71623a16a",
+		"name": "wifi-cafe-api {{server}}",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get random cafe",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}:5000/random",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"random"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add cafe",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "testcafe",
+							"type": "text"
+						},
+						{
+							"key": "map_url",
+							"value": "https://some.maps.url",
+							"type": "text"
+						},
+						{
+							"key": "img_url",
+							"value": "https://some.image.url",
+							"type": "text"
+						},
+						{
+							"key": "location",
+							"value": "here",
+							"type": "text"
+						},
+						{
+							"key": "seats",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "has_toilet",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "has_wifi",
+							"value": "true",
+							"type": "text"
+						},
+						{
+							"key": "has_sockets",
+							"value": "false",
+							"type": "text"
+						},
+						{
+							"key": "can_take_calls",
+							"value": "false",
+							"type": "text"
+						},
+						{
+							"key": "coffee_price",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{server}}:5000/add",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all cafes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}:5000/all",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search cafes (querystring)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}:5000/search?location=London Bridge",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "location",
+							"value": "London Bridge"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search cafes (path variable)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}:5000/search/London Bridge",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"search",
+						"London Bridge"
+					]
+				},
+				"description": "description"
+			},
+			"response": []
+		},
+		{
+			"name": "update coffee price",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://{{server}}:5000/update-price/1?price=10",
+					"protocol": "http",
+					"host": [
+						"{{server}}"
+					],
+					"port": "5000",
+					"path": [
+						"update-price",
+						"1"
+					],
+					"query": [
+						{
+							"key": "price",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server",
+			"value": "192.168.1.10"
+		}
+	]
+}
