@@ -300,6 +300,9 @@ def update_price(cafeid):
     logger.debug(f"method: {request.method}")
     logger.debug(f"cafeid: {cafeid}")
     price = request.args.get("price")
+    logger.debug(f"price from querystring {price}")
+    price = request.form["price"]
+    logger.debug(f"price from body {price}")
     logger.debug(f"price : {price}")
     cafe = db.session.query(Cafe).get(cafeid)
     logger.debug(cafe)
