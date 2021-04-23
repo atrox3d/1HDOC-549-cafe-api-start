@@ -168,8 +168,18 @@
 			"request": {
 				"method": "PATCH",
 				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "price",
+							"value": "10.0",
+							"type": "text"
+						}
+					]
+				},
 				"url": {
-					"raw": "http://{{server}}:5000/update-price/1?price=10",
+					"raw": "http://{{server}}:5000/update-price/1",
 					"protocol": "http",
 					"host": [
 						"{{server}}"
@@ -178,12 +188,6 @@
 					"path": [
 						"update-price",
 						"1"
-					],
-					"query": [
-						{
-							"key": "price",
-							"value": "10"
-						}
 					]
 				}
 			},
