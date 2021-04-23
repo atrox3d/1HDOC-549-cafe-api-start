@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime as dt
+import sys
 
 # import util.parentimport
 # util.parentimport.add_parent_import()
@@ -207,11 +208,25 @@ def add_cafe(
 
 
 if __name__ == '__main__':
+    try:
+        with open("../server.json") as fp:
+            config = json.load(fp)
+            # print(config)
+            SERVER = config["SERVER"]
+    except Exception as e:
+        print(repr(e))
+
+    try:
+        SERVER = sys.argv[1]
+    except IndexError:
+        pass
+
+    print(f"SERVER: {SERVER}")
     # get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
     # search_cafes("London Bridge", True)
-    add_cafe("name")
+    # add_cafe("name")
 
 
 
