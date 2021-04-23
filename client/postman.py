@@ -27,6 +27,7 @@ def api_call(
         username=None,
         token=None,
         params=None,
+        data=None,
         moreheaders=None
 ):
     """
@@ -34,16 +35,18 @@ def api_call(
     """
     print(f"calling request.{http_method.__name__} {endpoint}")
     # if params:
-    print(f"\twith params: {params}")
+    print(f"\twith params: {json.dumps(params, indent=4)}")
+    print(f"\twith data: {json.dumps(data, indent=4)}")
     # authentication via headers, not in the url
     # headers = {"X-USER-TOKEN": token}
     headers = {}
     # add more header keys, if available
     if moreheaders:
         headers.update(moreheaders)
-    print(f"\twith headers: {headers}")
+    print(f"\twith headers: {json.dumps(headers, indent=4)}")
     #
-    response = http_method(url=endpoint, json=params, headers=headers)
+    response = http_method(url=endpoint, data=data, params=params, headers=headers)
+    print(f"final URL {response.url}")
     if response.status_code == 200:
         print("SUCCESS|status: ", response.status_code)
     else:
@@ -186,11 +189,32 @@ def search_cafes(location, querystring=True):
     return response
 
 
-if __name__ == '__main__':
-    get_randomcafe()
-    get_allcafes()
-    search_cafes("London Bridge", False)
+def add_cafe(
+        name,
+        map_url="https://some.maps.url",
+        img_url="https://some.image.url",
+        location="here",
+        seats=1,
+        has_toilet=True,
+        has_wifi=True,
+        has_sockets=True,
+        can_take_calls=False,
+        coffee_price=1.0
+):
+    payload = locals()
+    response = api_call(HTTP_POST, ADD_CAFE_ENDPOINT, data=payload)
     pass
+
+
+if __name__ == '__main__':
+    # get_randomcafe()
+    # get_allcafes()
+    # search_cafes("London Bridge", False)
+    # search_cafes("London Bridge", True)
+    add_cafe("name")
+
+
+
     # create_user(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN)
     # create_graph(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN,
     #              graph_id="graph1",

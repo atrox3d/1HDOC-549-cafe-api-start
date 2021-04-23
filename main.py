@@ -273,15 +273,16 @@ def add_cafe():
     cafe_dict = request.form.to_dict()
     logger.debug(f"request.form.to_dict(): {cafe_dict}")
     # same thing
-    cafe = Cafe(**cafe_dict)
-    cafe = Cafe(**request.form.to_dict())
-    logger.debug(f"new cafe: {cafe}")
-    db.session.add(cafe)
     try:
+        cafe = Cafe(**cafe_dict)
+        cafe = Cafe(**request.form.to_dict())
+        logger.debug(f"new cafe: {cafe}")
+        db.session.add(cafe)
         db.session.commit()
-        return jsonify(response=dict(success="succesful added the new cafè"))
+        return jsonify(response=dict(success="succesful added the new cafe"))
     except Exception as e:
-        return jsonify(response=dict(error="could not add cafè"))
+        print(repr(e))
+        return jsonify(response=dict(error="could not add cafe", exception=repr(e)))
 
 
 ################################################################################
