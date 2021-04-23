@@ -8,6 +8,8 @@ import util.logging
 from util.logging import log_decorator
 import logging
 
+import util.network
+
 rootlogger = util.logging.get_root_logger(
     format_string='%(asctime)s | %(levelname)-8s | %(name)-15s | %(funcName)15s() | %(message)s'
 
@@ -314,4 +316,4 @@ def update_price(cafeid):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host=util.network.get_ipaddress())
