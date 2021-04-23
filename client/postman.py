@@ -3,11 +3,32 @@ import json
 from datetime import datetime as dt
 import sys
 
+
 # import util.parentimport
 # util.parentimport.add_parent_import()
 # from _myob.habit_tracker import myob
 
-SERVER = "http://127.0.0.1:5000"
+def get_server(server="http://localhost:5000"):
+    print(f"SERVER default: {server}")
+    try:
+        with open("../server.json") as fp:
+            config = json.load(fp)
+            # print(config)
+            server = config["SERVER"]
+            print(f"SERVER from ../server.json: {server}")
+    except Exception as e:
+        print(repr(e))
+
+    try:
+        server = sys.argv[1]
+        print(f"SERVER from sys.argv[1]: {server}")
+    except IndexError:
+        pass
+
+    return server
+
+
+SERVER = get_server()
 HOME_ENDPOINT = f"{SERVER}/"
 GET_RANDOMCAFE_ENDPOINT = f"{SERVER}/random"
 GET_ALLCAFES_ENDPOINT = f"{SERVER}/all"
@@ -18,6 +39,7 @@ UPDATE_COFFEEPRICE_ENDPOINT = f"{SERVER}/update-price/{{}}"  # ?price=<price>
 
 HTTP_GET = requests.get
 HTTP_POST = requests.post
+HTTP_PATCH = requests.patch
 HTTP_PUT = requests.put
 HTTP_DEL = requests.delete
 
@@ -27,12 +49,12 @@ def api_call(
         endpoint,
         username=None,
         token=None,
-        params=None,
-        data=None,
+        params=None,  # GET querystring
+        data=None,  # POST payload
         moreheaders=None
 ):
     """
-    call pixela api, generalized
+    call flask api, generalized
     """
     print(f"calling request.{http_method.__name__} {endpoint}")
     # if params:
@@ -207,29 +229,20 @@ def add_cafe(
     pass
 
 
+def update_price(id, price):
+    payload = dict(price=price)
+    url = UPDATE_COFFEEPRICE_ENDPOINT.format(id)
+    response = api_call(HTTP_PATCH, url, data=payload)
+    return response
+
+
 if __name__ == '__main__':
-    try:
-        with open("../server.json") as fp:
-            config = json.load(fp)
-            # print(config)
-            SERVER = config["SERVER"]
-    except Exception as e:
-        print(repr(e))
-
-    try:
-        SERVER = sys.argv[1]
-    except IndexError:
-        pass
-
-    print(f"SERVER: {SERVER}")
     # get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
-    # search_cafes("London Bridge", True)
+    # search_cafes("London Bridge")
     # add_cafe("name")
-
-
-
+    update_price(1, 10.0)
     # create_user(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN)
     # create_graph(username=myob.PIXELA_USERNAME, token=myob.PIXELA_TOKEN,
     #              graph_id="graph1",
