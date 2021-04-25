@@ -11,22 +11,23 @@ DEL = requests.delete
 
 
 class Debug:
-    def __init__(self, enabled=False):
-        self.enabled = enabled
+    from dataclasses import dataclass
 
-    def __call__(self, *args, **kwargs):
-        return self.enabled
+    @dataclass()
+    class FakeResponse:
+        status_code = 200
+        text = "debug fake response"
 
-    def response(self, status_code=200, text="debug response"):
-        sc = status_code
-        tx = text
-        from dataclasses import dataclass
+    enabled = True
+    response = FakeResponse()
 
-        class FakeResponse(dataclass):
-            status_code = sc
-            text = tx
+    @classmethod
+    def enable(cls):
+        cls.enabled = True
 
-        return FakeResponse()
+    @classmethod
+    def disable(cls):
+        cls.enabled = False
 
 
 def get_server(server="http://localhost:5000"):
@@ -142,6 +143,7 @@ def update_price(id, price):
 if __name__ == '__main__':
     pass
     get_server()
+    print(Debug)
     # get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
