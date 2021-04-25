@@ -3,12 +3,30 @@ import json
 from datetime import datetime as dt
 import sys
 
-
 GET = requests.get
 POST = requests.post
 PATCH = requests.patch
 PUT = requests.put
 DEL = requests.delete
+
+
+class Debug:
+    def __init__(self, enabled=False):
+        self.enabled = enabled
+
+    def __call__(self, *args, **kwargs):
+        return self.enabled
+
+    def response(self, status_code=200, text="debug response"):
+        sc = status_code
+        tx = text
+        from dataclasses import dataclass
+
+        class FakeResponse(dataclass):
+            status_code = sc
+            text = tx
+
+        return FakeResponse()
 
 
 def get_server(server="http://localhost:5000"):
