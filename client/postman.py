@@ -74,27 +74,6 @@ def api_call(
     return response
 
 
-def create_user(username: str, token: str):
-    """
-    create user: one shot
-    """
-    user_params = {
-        "username": username,
-        "token": token,
-        "agreeTermsOfService": "yes",
-        "notMinor": "yes",
-    }
-    response = api_call(
-        http_method=HTTP_POST,
-        endpoint=HOME_ENDPOINT,
-        username=username,
-        token=token,
-        params=user_params
-    )
-    # response.raise_for_status()
-    return response
-
-
 def get_randomcafe():
     response = api_call(HTTP_GET, GET_RANDOMCAFE_ENDPOINT)
     return response
