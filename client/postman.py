@@ -25,13 +25,7 @@ def get_server(server="http://localhost:5000"):
 
 
 SERVER = get_server()
-HOME_ENDPOINT = f"{SERVER}/"
-GET_RANDOMCAFE_ENDPOINT = f"{SERVER}/random"
-GET_ALLCAFES_ENDPOINT = f"{SERVER}/all"
-SEARCH_CAFES_QS_ENDPOINT = f"{SERVER}/search"  # ?location=<location>
-SEARCH_CAFES_PV_ENDPOINT = f"{SERVER}/search/{{}}"  # /search/<location>
-ADD_CAFE_ENDPOINT = f"{SERVER}/add"
-UPDATE_COFFEEPRICE_ENDPOINT = f"{SERVER}/update-price/{{}}"  # ?price=<price>
+# HOME_ENDPOINT = f"{SERVER}/"
 
 HTTP_GET = requests.get
 HTTP_POST = requests.post
@@ -75,21 +69,25 @@ def api_call(
 
 
 def get_randomcafe():
-    response = api_call(HTTP_GET, GET_RANDOMCAFE_ENDPOINT)
+    endpoint = f"{SERVER}/random"
+    response = api_call(HTTP_GET, endpoint)
     return response
 
 
 def get_allcafes():
-    response = api_call(HTTP_GET, GET_ALLCAFES_ENDPOINT)
+    endpoint = f"{SERVER}/all"
+    response = api_call(HTTP_GET, endpoint)
     return response
 
 
 def search_cafes(location, querystring=True):
     params = dict(location=location)
     if querystring:
-        response = api_call(HTTP_GET, SEARCH_CAFES_QS_ENDPOINT, params=params)
+        endpoint = f"{SERVER}/search"  # ?location=<location>
+        response = api_call(HTTP_GET, endpoint, params=params)
     else:
-        url = SEARCH_CAFES_PV_ENDPOINT.format(location)
+        endpoint = f"{SERVER}/search/{{}}"  # /search/<location>
+        url = endpoint.format(location)
         response = api_call(HTTP_GET, url)
     return response
 
@@ -106,14 +104,16 @@ def add_cafe(
         can_take_calls=False,
         coffee_price=1.0
 ):
+    endpoint = f"{SERVER}/add"
     payload = locals()
-    response = api_call(HTTP_POST, ADD_CAFE_ENDPOINT, data=payload)
+    response = api_call(HTTP_POST, endpoint, data=payload)
     pass
 
 
 def update_price(id, price):
+    endpoint = f"{SERVER}/update-price/{{}}"  # ?price=<price>
+    url = endpoint.format(id)
     payload = dict(price=price)
-    url = UPDATE_COFFEEPRICE_ENDPOINT.format(id)
     response = api_call(HTTP_PATCH, url, data=payload)
     return response
 
