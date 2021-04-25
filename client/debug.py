@@ -54,3 +54,25 @@ class Debug:
         callerframe = stack[1]
         caller = callerframe.function
         cls.printlogger("ERROR", caller, *msg)
+
+    @classmethod
+    def decorator(cls, function):
+
+        def params2str(*args, **kwargs):
+            argslist = list(map(str, args))
+            kwargslist = [f"{key}={value}" for key, value in kwargs.items()]
+            params = argslist + kwargslist
+            return ", ".join(params)
+
+        import functools
+        cls.info(f"decorating {function.__name__}")
+
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            cls.info(f"executing {function.__name__}({params2str(*args, **kwargs)})")
+            retval = function(*args, **kwargs)
+            cls.info("retval: ", retval)
+            return retval
+
+        cls.info("returning decorated")
+        return wrapper

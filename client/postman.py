@@ -2,6 +2,17 @@ import requests
 import json
 import sys
 
+try:
+    import util.network
+except Exception as e:
+    print(repr(e))
+    for p in sys.path:
+        print(p)
+    print("sys.path.append('..')")
+    sys.path.append("..")
+    import util.network
+    # raise SystemExit(repr(e))
+
 if not __package__:
     """
     running this script directly
@@ -15,7 +26,7 @@ else:
     """
     print("__package__: ", __package__)
     print("from .debug import Debug")
-    from .debug import Debug    # ok
+    from .debug import Debug  # ok
     # from client.debug import Debug    # ok
 
 GET = requests.get
@@ -25,6 +36,7 @@ PUT = requests.put
 DEL = requests.delete
 
 
+@Debug.decorator
 def get_server(server="http://localhost:5000"):
     Debug.info(f"default SERVER: {server}")
 
@@ -34,11 +46,11 @@ def get_server(server="http://localhost:5000"):
             Debug.info(f"trying {path}...")
             with open(path) as fp:
                 Debug.info(f"found {path}")
-                config = json.load(fp)
+                config: dict = json.load(fp)
                 Debug.info("config content:", config)
-                protocol = "http"
-                host = config["HOST"]
-                port = config["PORT"]
+                protocol = config.get("PROTOCOL", "http")
+                host = config.get("HOST", util.network.get_ipaddress())
+                port = config.get("PORT", 5000)
                 server = f"{protocol}://{host}:{port}"
                 Debug.info(f"SERVER from {path}: {server}")
         except Exception as e:
@@ -57,6 +69,7 @@ def get_server(server="http://localhost:5000"):
     return server
 
 
+@Debug.decorator
 def api_call(
         http_method,
         endpoint,
@@ -93,19 +106,21 @@ def api_call(
     Debug.info("response: ", response.text)
     return response
 
-
+@Debug.decorator
 def get_randomcafe():
     endpoint = f"{get_server()}/random"
     response = api_call(GET, endpoint)
     return response
 
 
+@Debug.decorator
 def get_allcafes():
     endpoint = f"{get_server()}/all"
     response = api_call(GET, endpoint)
     return response
 
 
+@Debug.decorator
 def search_cafes(location, querystring=True):
     params = dict(location=location)
     if querystring:
@@ -118,6 +133,7 @@ def search_cafes(location, querystring=True):
     return response
 
 
+@Debug.decorator
 def add_cafe(
         name,
         map_url="https://some.maps.url",
@@ -136,6 +152,7 @@ def add_cafe(
     pass
 
 
+@Debug.decorator
 def update_price(id, price):
     endpoint = f"{get_server()}/update-price/{{}}"  # ?price=<price>
     url = endpoint.format(id)
@@ -145,7 +162,7 @@ def update_price(id, price):
 
 
 if __name__ == '__main__':
-    get_server()
+    # get_server()
     # print(Debug)
     # Debug.printlogger("INFO", api_call, "test")
     # Debug.info("test")
