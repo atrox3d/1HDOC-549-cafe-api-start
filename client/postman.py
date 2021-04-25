@@ -4,34 +4,37 @@ from datetime import datetime as dt
 import sys
 
 
+GET = requests.get
+POST = requests.post
+PATCH = requests.patch
+PUT = requests.put
+DEL = requests.delete
+
+
 def get_server(server="http://localhost:5000"):
-    print(f"SERVER default: {server}")
-    try:
-        with open("../server.json") as fp:
-            config = json.load(fp)
-            # print(config)
-            server = config["SERVER"]
-            print(f"SERVER from ../server.json: {server}")
-    except Exception as e:
-        print(repr(e))
+    print("INFO    |", f"default SERVER: {server}")
+
+    jsonfile = "server.json"
+    for path in [f"../{jsonfile}", jsonfile]:
+        try:
+            print("INFO    |", f"trying {path}...")
+            with open(path) as fp:
+                print("INFO    |", f"found {path}")
+                config = json.load(fp)
+                print("INFO    |", "config content:", config)
+                server = config["SERVER"]
+                print("INFO    |", f"SERVER from {path}: {server}")
+        except Exception as e:
+            print("INFO    |", repr(e))
 
     try:
+        print("INFO    |", f"trying sys.argv[1]...")
         server = sys.argv[1]
-        print(f"SERVER from sys.argv[1]: {server}")
-    except IndexError:
-        pass
+        print("INFO    |", f"SERVER from sys.argv[1]: {server}")
+    except IndexError as ie:
+        print("INFO    |", repr(ie))
 
     return server
-
-
-SERVER = get_server()
-# HOME_ENDPOINT = f"{SERVER}/"
-
-HTTP_GET = requests.get
-HTTP_POST = requests.post
-HTTP_PATCH = requests.patch
-HTTP_PUT = requests.put
-HTTP_DEL = requests.delete
 
 
 def api_call(
@@ -69,26 +72,26 @@ def api_call(
 
 
 def get_randomcafe():
-    endpoint = f"{SERVER}/random"
-    response = api_call(HTTP_GET, endpoint)
+    endpoint = f"{get_server()}/random"
+    response = api_call(GET, endpoint)
     return response
 
 
 def get_allcafes():
-    endpoint = f"{SERVER}/all"
-    response = api_call(HTTP_GET, endpoint)
+    endpoint = f"{get_server()}/all"
+    response = api_call(GET, endpoint)
     return response
 
 
 def search_cafes(location, querystring=True):
     params = dict(location=location)
     if querystring:
-        endpoint = f"{SERVER}/search"  # ?location=<location>
-        response = api_call(HTTP_GET, endpoint, params=params)
+        endpoint = f"{get_server()}/search"  # ?location=<location>
+        response = api_call(GET, endpoint, params=params)
     else:
-        endpoint = f"{SERVER}/search/{{}}"  # /search/<location>
+        endpoint = f"{get_server()}/search/{{}}"  # /search/<location>
         url = endpoint.format(location)
-        response = api_call(HTTP_GET, url)
+        response = api_call(GET, url)
     return response
 
 
@@ -104,23 +107,25 @@ def add_cafe(
         can_take_calls=False,
         coffee_price=1.0
 ):
-    endpoint = f"{SERVER}/add"
+    endpoint = f"{get_server()}/add"
     payload = locals()
-    response = api_call(HTTP_POST, endpoint, data=payload)
+    response = api_call(POST, endpoint, data=payload)
     pass
 
 
 def update_price(id, price):
-    endpoint = f"{SERVER}/update-price/{{}}"  # ?price=<price>
+    endpoint = f"{get_server()}/update-price/{{}}"  # ?price=<price>
     url = endpoint.format(id)
     payload = dict(price=price)
-    response = api_call(HTTP_PATCH, url, data=payload)
+    response = api_call(PATCH, url, data=payload)
     return response
 
 
 if __name__ == '__main__':
+    pass
+    get_server()
     # get_randomcafe()
-    get_allcafes()
+    # get_allcafes()
     # search_cafes("London Bridge", False)
     # search_cafes("London Bridge")
     # add_cafe("name")
