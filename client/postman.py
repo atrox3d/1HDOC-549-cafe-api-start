@@ -21,7 +21,7 @@ class Debug:
         text = "debug fake response"
         url = "debug"
 
-    enabled = True
+    enabled = False
     response = FakeResponse()
 
     @classmethod
@@ -181,12 +181,11 @@ def update_price(id, price):
 
 
 if __name__ == '__main__':
-    pass
     get_server()
     # print(Debug)
     # Debug.printlogger("INFO", api_call, "test")
     # Debug.info("test")
-
+    # Debug.disable()
     get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
