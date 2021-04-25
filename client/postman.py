@@ -1,3 +1,5 @@
+import inspect
+
 import requests
 import json
 from datetime import datetime as dt
@@ -17,6 +19,7 @@ class Debug:
     class FakeResponse:
         status_code = 200
         text = "debug fake response"
+        url = "debug"
 
     enabled = True
     response = FakeResponse()
@@ -29,29 +32,63 @@ class Debug:
     def disable(cls):
         cls.enabled = False
 
+    @classmethod
+    def printlogger(cls, level, callername, *msg):
+        print(f"{level:<8}|", f"{callername:>20}()|", *msg)
+
+    @classmethod
+    def info(cls, *msg):
+        stack = inspect.stack()
+        callerframe = stack[1]
+        caller = callerframe.function
+        cls.printlogger("INFO", caller, *msg)
+
+    @classmethod
+    def debug(cls, msg):
+        if not cls.enabled:
+            return
+        stack = inspect.stack()
+        callerframe = stack[1]
+        caller = callerframe.function
+        cls.printlogger("INFO", caller, *msg)
+
+    @classmethod
+    def success(cls, *msg):
+        stack = inspect.stack()
+        callerframe = stack[1]
+        caller = callerframe.function
+        cls.printlogger("SUCCESS", caller, *msg)
+
+    @classmethod
+    def error(cls, msg):
+        stack = inspect.stack()
+        callerframe = stack[1]
+        caller = callerframe.function
+        cls.printlogger("ERROR", caller, *msg)
+
 
 def get_server(server="http://localhost:5000"):
-    print("INFO    |", f"default SERVER: {server}")
+    Debug.info(f"default SERVER: {server}")
 
     jsonfile = "server.json"
     for path in [f"../{jsonfile}", jsonfile]:
         try:
-            print("INFO    |", f"trying {path}...")
+            Debug.info(f"trying {path}...")
             with open(path) as fp:
-                print("INFO    |", f"found {path}")
+                Debug.info(f"found {path}")
                 config = json.load(fp)
-                print("INFO    |", "config content:", config)
+                Debug.info("config content:", config)
                 server = config["SERVER"]
-                print("INFO    |", f"SERVER from {path}: {server}")
+                Debug.info(f"SERVER from {path}: {server}")
         except Exception as e:
-            print("INFO    |", repr(e))
+            Debug.info(repr(e))
 
     try:
-        print("INFO    |", f"trying sys.argv[1]...")
+        Debug.info(f"trying sys.argv[1]...")
         server = sys.argv[1]
-        print("INFO    |", f"SERVER from sys.argv[1]: {server}")
+        Debug.info(f"SERVER from sys.argv[1]: {server}")
     except IndexError as ie:
-        print("INFO    |", repr(ie))
+        Debug.info(repr(ie))
 
     return server
 
@@ -68,25 +105,28 @@ def api_call(
     """
     call flask api, generalized
     """
-    print(f"calling request.{http_method.__name__} {endpoint}")
+    Debug.info(f"calling request.{http_method.__name__} {endpoint}")
     # if params:
-    print(f"\twith params: {json.dumps(params, indent=4)}")
-    print(f"\twith data: {json.dumps(data, indent=4)}")
+    Debug.info(f"\twith params: {json.dumps(params, indent=4)}")
+    Debug.info(f"\twith data: {json.dumps(data, indent=4)}")
     # authentication via headers, not in the url
     # headers = {"X-USER-TOKEN": token}
     headers = {}
     # add more header keys, if available
     if moreheaders:
         headers.update(moreheaders)
-    print(f"\twith headers: {json.dumps(headers, indent=4)}")
+    Debug.info(f"\twith headers: {json.dumps(headers, indent=4)}")
     #
-    response = http_method(url=endpoint, data=data, params=params, headers=headers)
-    print(f"final URL {response.url}")
-    if response.status_code == 200:
-        print("SUCCESS|status: ", response.status_code)
+    if Debug.enabled:
+        response = Debug.response
     else:
-        print("ERROR  |status: ", response.status_code)
-    print("response: ", response.text)
+        response = http_method(url=endpoint, data=data, params=params, headers=headers)
+    Debug.info(f"final URL {response.url}")
+    if response.status_code == 200:
+        Debug.success("status: ", response.status_code)
+    else:
+        Debug.error("status: ", response.status_code)
+    Debug.info("response: ", response.text)
     return response
 
 
@@ -143,8 +183,11 @@ def update_price(id, price):
 if __name__ == '__main__':
     pass
     get_server()
-    print(Debug)
-    # get_randomcafe()
+    # print(Debug)
+    # Debug.printlogger("INFO", api_call, "test")
+    # Debug.info("test")
+
+    get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
     # search_cafes("London Bridge")
