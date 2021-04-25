@@ -1,70 +1,28 @@
-import inspect
-
 import requests
 import json
-from datetime import datetime as dt
 import sys
+
+if not __package__:
+    """
+    running this script directly
+    """
+    print("not package")
+    print("from debug import Debug")
+    from debug import Debug
+else:
+    """
+    importing this script from another script
+    """
+    print("__package__: ", __package__)
+    print("from .debug import Debug")
+    from .debug import Debug    # ok
+    # from client.debug import Debug    # ok
 
 GET = requests.get
 POST = requests.post
 PATCH = requests.patch
 PUT = requests.put
 DEL = requests.delete
-
-
-class Debug:
-    from dataclasses import dataclass
-
-    @dataclass()
-    class FakeResponse:
-        status_code = 200
-        text = "debug fake response"
-        url = "debug"
-
-    enabled = False
-    response = FakeResponse()
-
-    @classmethod
-    def enable(cls):
-        cls.enabled = True
-
-    @classmethod
-    def disable(cls):
-        cls.enabled = False
-
-    @classmethod
-    def printlogger(cls, level, callername, *msg):
-        print(f"{level:<8}|", f"{callername:>20}()|", *msg)
-
-    @classmethod
-    def info(cls, *msg):
-        stack = inspect.stack()
-        callerframe = stack[1]
-        caller = callerframe.function
-        cls.printlogger("INFO", caller, *msg)
-
-    @classmethod
-    def debug(cls, msg):
-        if not cls.enabled:
-            return
-        stack = inspect.stack()
-        callerframe = stack[1]
-        caller = callerframe.function
-        cls.printlogger("INFO", caller, *msg)
-
-    @classmethod
-    def success(cls, *msg):
-        stack = inspect.stack()
-        callerframe = stack[1]
-        caller = callerframe.function
-        cls.printlogger("SUCCESS", caller, *msg)
-
-    @classmethod
-    def error(cls, msg):
-        stack = inspect.stack()
-        callerframe = stack[1]
-        caller = callerframe.function
-        cls.printlogger("ERROR", caller, *msg)
 
 
 def get_server(server="http://localhost:5000"):
