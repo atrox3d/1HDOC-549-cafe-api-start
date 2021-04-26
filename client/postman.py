@@ -1,18 +1,28 @@
 import requests
 import json
 import sys
+import os
 
 try:
+    # for n, p in enumerate(sys.path):
+    #     print(f"{n=}, {p=}")
     import util.network
 except Exception as e:
     print(repr(e))
-    for p in sys.path:
-        print(p)
-    print("sys.path.append('..')")
-    sys.path.append("..")
-    import util.network
-    # raise SystemExit(repr(e))
+    print(f"{os.getcwd()=}")
+    script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
+    project_path = os.path.abspath(script_path + "/..")
+    print(f"{project_path=}")
+    for n, p in enumerate(sys.path):
+        print(f"{n=}, {p=}")
+    print(f"sys.path.append('{project_path}')")
+    sys.path.append(project_path)
+    try:
+        import util.network
+    except Exception as e:
+        raise SystemExit(repr(e))
 
+exit()
 if not __package__:
     """
     running this script directly
