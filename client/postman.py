@@ -2,26 +2,16 @@ import requests
 import json
 import sys
 import os
-################################################################################
-# https://stackoverflow.com/questions/14132789/relative-imports-for-the-billionth-time
-# https://chrisyeh96.github.io/2017/08/08/definitive-guide-python-imports.html#case-3-importing-from-parent-directory
-################################################################################
-"""
-add project root to sys.path to import from parent folder
-change the number of ".." accordingly
-"""
-root = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), ".."))
-print(f"adding project root tp sys.path: {root=}")
-sys.path.append(root)
-################################################################################
-import util.network
 
 if not __package__:
     """
     running this script directly
     """
     print("not package")
-    print("from debug import Debug")
+    import parentimport
+
+    parentimport.parent_import()
+    # parentimport.show_syspath()
     from debug import Debug
     from config import get_server
 else:
@@ -29,50 +19,20 @@ else:
     importing this script from another script
     """
     print("__package__: ", __package__)
-    print("from .debug import Debug")
+    from . import parentimport
+
+    parentimport.parent_import()
+    # parentimport.show_syspath()
     from .debug import Debug  # ok
     from .config import get_server
-    # from client.debug import Debug    # ok
-exit()
+
+import util.network
 
 GET = requests.get
 POST = requests.post
 PATCH = requests.patch
 PUT = requests.put
 DEL = requests.delete
-
-
-@Debug.decorator
-def get_server(server="http://localhost:5000"):
-    Debug.info(f"default SERVER: {server}")
-
-    jsonfile = "server.json"
-    for path in [f"../{jsonfile}", jsonfile]:
-        try:
-            Debug.info(f"trying {path}...")
-            with open(path) as fp:
-                Debug.info(f"found {path}")
-                config: dict = json.load(fp)
-                Debug.info("config content:", config)
-                protocol = config.get("PROTOCOL", "http")
-                host = config.get("HOST", util.network.get_ipaddress())
-                port = config.get("PORT", 5000)
-                server = f"{protocol}://{host}:{port}"
-                Debug.info(f"SERVER from {path}: {server}")
-        except Exception as e:
-            Debug.info(repr(e))
-
-    try:
-        Debug.info(f"trying sys.argv[1]...")
-        protocol = "http"
-        host = sys.argv[1]
-        port = sys.argv[2]
-        server = f"{protocol}://{host}:{port}"
-        Debug.info(f"SERVER from sys.argv[1]: {server}")
-    except IndexError as ie:
-        Debug.info(repr(ie))
-
-    return server
 
 
 @Debug.decorator
@@ -111,6 +71,7 @@ def api_call(
         Debug.error("status: ", response.status_code)
     Debug.info("response: ", response.text)
     return response
+
 
 @Debug.decorator
 def get_randomcafe():
