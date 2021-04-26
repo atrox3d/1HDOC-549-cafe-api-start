@@ -4,9 +4,10 @@ import sys
 import util.network
 from client.debug import Debug
 
+IPADDRESS = util.network.get_ipaddress()
 
 @Debug.decorator
-def get_server(server="http://localhost:5000"):
+def get_server(server=f"http://{IPADDRESS}:5000"):
     Debug.info(f"default SERVER: {server}")
 
     jsonfile = "server.json"
