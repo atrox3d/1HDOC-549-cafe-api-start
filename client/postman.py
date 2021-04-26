@@ -4,27 +4,18 @@ import sys
 import os
 ################################################################################
 # https://stackoverflow.com/questions/14132789/relative-imports-for-the-billionth-time
+# https://chrisyeh96.github.io/2017/08/08/definitive-guide-python-imports.html#case-3-importing-from-parent-directory
 ################################################################################
-try:
-    # for n, p in enumerate(sys.path):
-    #     print(f"{n=}, {p=}")
-    import util.network
-except Exception as e:
-    print(repr(e))
-    print(f"{os.getcwd()=}")
-    script_path = os.path.abspath(os.path.dirname(sys.argv[0]))
-    project_path = os.path.abspath(script_path + "/..")
-    print(f"{project_path=}")
-    for n, p in enumerate(sys.path):
-        print(f"{n=}, {p=}")
-    print(f"sys.path.append('{project_path}')")
-    sys.path.append(project_path)
-    try:
-        import util.network
-    except Exception as e:
-        raise SystemExit(repr(e))
+"""
+add project root to sys.path to import from parent folder
+change the number of ".." accordingly
+"""
+root = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), ".."))
+print(f"adding project root tp sys.path: {root=}")
+sys.path.append(root)
+################################################################################
+import util.network
 
-exit()
 if not __package__:
     """
     running this script directly
@@ -32,6 +23,7 @@ if not __package__:
     print("not package")
     print("from debug import Debug")
     from debug import Debug
+    from config import get_server
 else:
     """
     importing this script from another script
@@ -39,7 +31,9 @@ else:
     print("__package__: ", __package__)
     print("from .debug import Debug")
     from .debug import Debug  # ok
+    from .config import get_server
     # from client.debug import Debug    # ok
+exit()
 
 GET = requests.get
 POST = requests.post

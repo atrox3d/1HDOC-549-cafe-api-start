@@ -46,7 +46,7 @@ class Cafe(db.Model):
             if str(col.type) == "BOOLEAN":
                 logger.info("BOOLEAN detected")
                 logger.info(kwargs[col.name])
-                if kwargs[col.name].lower() in [ "true", "1" ]:
+                if kwargs[col.name].lower() in ["true", "1"]:
                     kwargs[col.name] = True
                 else:
                     kwargs[col.name] = False
@@ -313,15 +313,13 @@ def update_price(cafeid):
     else:
         return jsonify(error=dict(notfound=f"could not find cafe id: {cafeid}")), 404
 
+
 ################################################################################
 # HTTP DELETE - Delete Record
 ################################################################################
-
 
 
 if __name__ == '__main__':
     app.run(debug=True, host=util.network.get_ipaddress())
 
     git = "laptop"
-
-
