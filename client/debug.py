@@ -49,7 +49,7 @@ class Debug:
         cls.printlogger("SUCCESS", caller, *msg)
 
     @classmethod
-    def error(cls, msg):
+    def error(cls, *msg):
         stack = inspect.stack()
         callerframe = stack[1]
         caller = callerframe.function
