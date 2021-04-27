@@ -13,7 +13,7 @@ if not __package__:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from debug import Debug
-    from config import get_server
+    from config import get_server, parse_arguments
 else:
     """
     importing this script from another script
@@ -24,7 +24,7 @@ else:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from .debug import Debug  # ok
-    from .config import get_server
+    from .config import get_server, parse_arguments
 
 import util.network
 
@@ -129,12 +129,13 @@ def update_price(id, price):
 
 
 if __name__ == '__main__':
+    parse_arguments()
     # get_server()
     # print(Debug)
     # Debug.printlogger("INFO", api_call, "test")
     # Debug.info("test")
     # Debug.disable()
-    get_randomcafe()
+    # get_randomcafe()
     # get_allcafes()
     # search_cafes("London Bridge", False)
     # search_cafes("London Bridge")
