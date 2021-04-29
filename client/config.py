@@ -9,24 +9,33 @@ from client.debug import Debug
 
 @dataclasses.dataclass
 class Endpoint:
+    """
+    represents a end point and its parameters
+    """
     name: str = None
     args: list[str] = None
 
 
 @dataclasses.dataclass
 class Config:
+    """
+    configuration class
+    """
     available_servers: list[str] = None
     server: str = None
     endpoint: Endpoint = None
 
 
+# TODO: remove?
 CONFIG = None
-
-
 # IPADDRESS = util.network.get_ipaddress()
+
 
 @Debug.decorator
 def get_working_server(servers):
+    """
+    test each server until doesnt get a connection or fails
+    """
     workingserver = None
     for server in servers:
         home = f"{server}/"
@@ -42,6 +51,9 @@ def get_working_server(servers):
 
 @Debug.decorator
 def get_available_servers(protocol="http", port="5000"):
+    """
+    loops through the local adapters and build a list of possible servers
+    """
     servers = []
     ips = util.network.get_localips()
     for host in ips:
@@ -52,6 +64,10 @@ def get_available_servers(protocol="http", port="5000"):
 
 @Debug.decorator
 def get_server_from_args(args) -> str:
+    """
+    creates a string representation of a server
+    based on command line arguments
+    """
     Debug.info(f"{args=}")
     protocol = args.protocol or "http"
     host = args.address or "localhost"
@@ -65,6 +81,10 @@ def get_server_from_args(args) -> str:
 
 @Debug.decorator
 def get_server_from_file(file):
+    """
+    builds a string representation of a server
+    from a json file
+    """
     try:
         Debug.info(f"trying {file}...")
         with open(file) as fp:
@@ -82,9 +102,14 @@ def get_server_from_file(file):
 
 @Debug.decorator
 def parse_arguments() -> Config:
+    """
+    creates a parser for command line arguments
+    populates a Config object with the results
+    """
     global CONFIG
 
     Debug.info("Creating parser")
+
     parser = argparse.ArgumentParser(
         prog="postman",
         description="change the program configuration",
@@ -92,13 +117,13 @@ def parse_arguments() -> Config:
         usage="%(prog)s [-f file] | [-p protocol -a addreass -P port]"
     )
 
-    subparsers = parser.add_subparsers()
-    # subparsers.add_parser()
-
     parser.add_argument("-p", "--protocol", help="set protocol", )
     parser.add_argument("-a", "--address", help="set address", )
     parser.add_argument("-P", "--port", help="set port", )
     parser.add_argument("-f", "--file", help="reads config from file", )
+
+    subparsers = parser.add_subparsers()
+    # subparsers.add_parser()
 
     args = parser.parse_args()
     Debug.info(f"{args=}")
@@ -113,7 +138,7 @@ def parse_arguments() -> Config:
         Debug.info(f"{args.file=}")
         server = get_server_from_file(args.file)
     elif any(notfile):
-        Debug.info(f"{vars(args)}")
+        Debug.info(f"{vars(args)=}")
         server = get_server_from_args(args)
         # Debug.info(f"{server=}")
     else:
