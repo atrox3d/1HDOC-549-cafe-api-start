@@ -3,8 +3,29 @@ import sys
 import argparse
 import dataclasses
 import requests
-import util.network
-from client.debug import Debug
+
+if not __package__:
+    """
+    running this script directly
+    """
+    print("not package")
+    import parentimport
+
+    parentimport.parent_import()
+    # parentimport.show_syspath()
+    import util.network
+    from client.debug import Debug
+else:
+    """
+    importing this script from another script
+    """
+    print("__package__: ", __package__)
+    from . import parentimport
+
+    parentimport.parent_import()
+    # parentimport.show_syspath()
+    import util.network
+    from client.debug import Debug
 
 
 @dataclasses.dataclass
@@ -12,8 +33,9 @@ class Endpoint:
     """
     represents a end point and its parameters
     """
-    name: str = None
-    args: list[str] = None
+    url: str = None
+    route: str = None
+    params: list[str] = None
 
 
 @dataclasses.dataclass
@@ -28,6 +50,8 @@ class Config:
 
 # TODO: remove?
 CONFIG = None
+
+
 # IPADDRESS = util.network.get_ipaddress()
 
 
@@ -101,6 +125,19 @@ def get_server_from_file(file):
 
 
 @Debug.decorator
+def get_endpoint_from_args(args):
+    url = getattr(args, "endpoint.url", None)
+    route = getattr(args, "endpoint.route", None)
+    params = getattr(args, "endpoint.params", None)
+
+    if any([url, route]):
+        endpoint = Endpoint(url, route, params)
+        return endpoint
+    else:
+        return None
+
+
+@Debug.decorator
 def parse_arguments() -> Config:
     """
     creates a parser for command line arguments
@@ -123,11 +160,21 @@ def parse_arguments() -> Config:
     parser.add_argument("-f", "--file", help="reads config from file", )
 
     subparsers = parser.add_subparsers()
-    # subparsers.add_parser()
+    endpoint = subparsers.add_parser("endpoint")
+
+    group = endpoint.add_mutually_exclusive_group()
+    group.add_argument("-u", "--url", dest="endpoint.url")
+    group.add_argument("-r", "--route", dest="endpoint.route")
+
+    endpoint.add_argument("-p", "--params", dest="endpoint.params", action="extend", nargs='+')
 
     args = parser.parse_args()
+
     Debug.info(f"{args=}")
-    notfile = [value for name, value in vars(args).items() if name != "file"]
+    #
+    print(getattr(args, 'endpoint.url'))
+    #
+    notfile = [value for name, value in vars(args).items() if name in ["protocol", "host", "port"]]
     if args.file and any(notfile):
         parser.error("cannot specify -f and [-paP]")
         exit()
@@ -150,10 +197,14 @@ def parse_arguments() -> Config:
     Debug.info(f"{server=}")
     config.server = server
 
+    config.endpoint = get_endpoint_from_args(args)
     # config.endpoint = Endpoint()
     CONFIG = config
     return config
 
 
 if __name__ == '__main__':
-    parse_arguments()
+    args = input("arguments: ").split()
+    sys.argv.extend(args)
+    config = parse_arguments()
+    print(f"{config=}")

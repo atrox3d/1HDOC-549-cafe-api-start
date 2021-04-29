@@ -139,6 +139,15 @@ if __name__ == '__main__':
     Debug.info(CONFIG)
     if not SERVER:
         raise SystemExit("Cannot find server")
+    Debug.info(f"server: {SERVER}")
+    if ENDPOINT and ENDPOINT.route:
+        try:
+            if ENDPOINT.params:
+                globals().get(ENDPOINT.route)(*ENDPOINT.params)
+            else:
+                globals().get(ENDPOINT.route)()
+        except Exception as e:
+            print(repr(e))
 
     # get_server()
     # print(Debug)
