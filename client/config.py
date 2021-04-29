@@ -15,7 +15,7 @@ class Endpoint:
 
 @dataclasses.dataclass
 class Config:
-    servers: list[str] = None
+    server: str = None
     endpoint: Endpoint = None
 
 
@@ -24,19 +24,22 @@ CONFIG = None
 
 # IPADDRESS = util.network.get_ipaddress()
 
+@Debug.decorator
 def get_working_server(servers):
     workingserver = None
     for server in servers:
         home = f"{server}/"
+        Debug.info(f"trying {home}")
         try:
             response = requests.get(home)
             response.raise_for_status()
             workingserver = server
         except Exception:
             continue
-    return server
+    return workingserver
 
 
+@Debug.decorator
 def get_available_servers(protocol, host, port):
     servers = []
     if not host:
@@ -51,7 +54,8 @@ def get_available_servers(protocol, host, port):
     return servers
 
 
-def get_servers_from_args(args) -> list[str]:
+@Debug.decorator
+def get_server_from_args(args) -> str:
     Debug.info(f"{args=}")
     if args.file:
         Debug.info(f"{args.file=}")
@@ -76,12 +80,17 @@ def get_servers_from_args(args) -> list[str]:
 
     servers = get_available_servers(protocol, host, port)
     Debug.info(f"{servers=}")
-    return servers
+
+    server = get_working_server(servers)
+    Debug.info(f"{server=}")
+    return server
 
 
+@Debug.decorator
 def parse_arguments() -> Config:
     global CONFIG
 
+    Debug.info("Creating parser")
     parser = argparse.ArgumentParser(
         prog="postman",
         description="change the program configuration",
@@ -97,10 +106,14 @@ def parse_arguments() -> Config:
     parser.add_argument("-f", "--file", help="reads config from file", )
 
     args = parser.parse_args()
-    servers = get_servers_from_args(args)
+    server = get_server_from_args(args)
 
     config = Config()
-    config.servers = servers
+    config.server = server
     # config.endpoint = Endpoint()
     CONFIG = config
     return config
+
+
+if __name__ == '__main__':
+    parse_arguments()

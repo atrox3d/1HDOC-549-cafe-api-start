@@ -23,7 +23,7 @@ class Debug:
 
     @classmethod
     def printlogger(cls, level, callername, *msg):
-        print(f"{level:<8}|", f"{callername:>20}()|", *msg)
+        print(f"{level:<8}|", f"{callername:>22}()|", *msg)
 
     @classmethod
     def info(cls, *msg):
