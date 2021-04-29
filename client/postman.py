@@ -13,7 +13,7 @@ if not __package__:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from debug import Debug
-    from config import get_server, parse_arguments
+    from config import get_server_from_args, parse_arguments
 else:
     """
     importing this script from another script
@@ -24,7 +24,7 @@ else:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from .debug import Debug  # ok
-    from .config import get_server, parse_arguments
+    from .config import get_server_from_args, parse_arguments
 
 import util.network
 
@@ -34,6 +34,9 @@ PATCH = requests.patch
 PUT = requests.put
 DEL = requests.delete
 
+CONFIG = None
+SERVER = None
+ENDPOINT = None
 
 @Debug.decorator
 def api_call(
@@ -75,14 +78,14 @@ def api_call(
 
 @Debug.decorator
 def get_randomcafe():
-    endpoint = f"{get_server()}/random"
+    endpoint = f"{SERVER}/random"
     response = api_call(GET, endpoint)
     return response
 
 
 @Debug.decorator
 def get_allcafes():
-    endpoint = f"{get_server()}/all"
+    endpoint = f"{SERVER}/all"
     response = api_call(GET, endpoint)
     return response
 
@@ -91,10 +94,10 @@ def get_allcafes():
 def search_cafes(location, querystring=True):
     params = dict(location=location)
     if querystring:
-        endpoint = f"{get_server()}/search"  # ?location=<location>
+        endpoint = f"{SERVER}/search"  # ?location=<location>
         response = api_call(GET, endpoint, params=params)
     else:
-        endpoint = f"{get_server()}/search/{{}}"  # /search/<location>
+        endpoint = f"{SERVER}/search/{{}}"  # /search/<location>
         url = endpoint.format(location)
         response = api_call(GET, url)
     return response
@@ -113,7 +116,7 @@ def add_cafe(
         can_take_calls=False,
         coffee_price=1.0
 ):
-    endpoint = f"{get_server()}/add"
+    endpoint = f"{SERVER}/add"
     payload = locals()
     response = api_call(POST, endpoint, data=payload)
     pass
@@ -121,7 +124,7 @@ def add_cafe(
 
 @Debug.decorator
 def update_price(id, price):
-    endpoint = f"{get_server()}/update-price/{{}}"  # ?price=<price>
+    endpoint = f"{SERVER}/update-price/{{}}"  # ?price=<price>
     url = endpoint.format(id)
     payload = dict(price=price)
     response = api_call(PATCH, url, data=payload)
@@ -129,7 +132,11 @@ def update_price(id, price):
 
 
 if __name__ == '__main__':
-    parse_arguments()
+    CONFIG = parse_arguments()
+    SERVER = CONFIG.server
+    ENDPOINT = CONFIG.endpoint
+    Debug.info(CONFIG)
+
     # get_server()
     # print(Debug)
     # Debug.printlogger("INFO", api_call, "test")
