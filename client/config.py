@@ -1,63 +1,27 @@
 import json
 import sys
 import argparse
-
+import dataclasses
 import util.network
 from client.debug import Debug
 
+
+@dataclasses.dataclass
+class Endpoint:
+    name: str = None
+    args: list[str] = None
+
+
+@dataclasses.dataclass
+class Config:
+    server: str = None
+    endpoint: Endpoint = None
+
+
 IPADDRESS = util.network.get_ipaddress()
 
-@Debug.decorator
-def get_server(server=f"http://{IPADDRESS}:5000"):
-    Debug.info(f"default SERVER: {server}")
 
-    jsonfile = "server.json"
-    for path in [f"../{jsonfile}", jsonfile]:
-        try:
-            Debug.info(f"trying {path}...")
-            with open(path) as fp:
-                Debug.info(f"found {path}")
-                config: dict = json.load(fp)
-                Debug.info("config content:", config)
-                protocol = config.get("PROTOCOL", "http")
-                host = config.get("HOST", util.network.get_ipaddress())
-                port = config.get("PORT", 5000)
-                server = f"{protocol}://{host}:{port}"
-                Debug.info(f"SERVER from {path}: {server}")
-        except Exception as e:
-            Debug.info(repr(e))
-
-    try:
-        Debug.info(f"trying sys.argv[1]...")
-        protocol = "http"
-        host = sys.argv[1]
-        port = sys.argv[2]
-        server = f"{protocol}://{host}:{port}"
-        Debug.info(f"SERVER from sys.argv[1]: {server}")
-    except IndexError as ie:
-        Debug.info(repr(ie))
-
-    return server
-
-
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        prog="postman",
-        description="change the program configuration",
-        epilog="epilog"
-    )
-
-    parser.add_argument("-p", "--protocol", help="set protocol",)
-    parser.add_argument("-a", "--address", help="set address",)
-    parser.add_argument("-P", "--port", help="set port",)
-    parser.add_argument("-f", "--file", help="reads config from file",)
-
-    args = parser.parse_args()
-
-    # print(args)
-    # print(args.protocol)
-    # for k, v in vars(args).items():
-    #     print(f"{k=}, {v=}")
+def get_server_from_args(args) -> str:
     Debug.info(f"{args=}")
     if args.file:
         Debug.info(f"{args.file=}")
@@ -68,7 +32,7 @@ def parse_arguments():
                 config: dict = json.load(fp)
                 Debug.info("config content:", config)
                 protocol = config.get("protocol", "http")
-                host = config.get("host", util.network.get_ipaddress())
+                host = config.get("host", IPADDRESS)
                 port = config.get("port", 5000)
                 server = f"{protocol}://{host}:{port}"
                 Debug.info(f"SERVER from {args.file}: {server}")
@@ -79,8 +43,33 @@ def parse_arguments():
         protocol = args.protocol or "http"
         host = args.address or util.network.get_ipaddress()
         port = args.port or 5000
-
     server = f"{protocol}://{host}:{port}"
     Debug.info(f"{server=}")
     return server
 
+
+def parse_arguments() -> Config:
+    global CONFIG
+
+    parser = argparse.ArgumentParser(
+        prog="postman",
+        description="change the program configuration",
+        epilog="epilog"
+    )
+
+    subparsers = parser.add_subparsers()
+    # subparsers.add_parser()
+
+    parser.add_argument("-p", "--protocol", help="set protocol", )
+    parser.add_argument("-a", "--address", help="set address", )
+    parser.add_argument("-P", "--port", help="set port", )
+    parser.add_argument("-f", "--file", help="reads config from file", )
+
+    args = parser.parse_args()
+    server = get_server_from_args(args)
+
+    config = Config()
+    config.server = server
+    # config.endpoint = Endpoint()
+    CONFIG = config
+    return config
