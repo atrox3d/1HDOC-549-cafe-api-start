@@ -15,6 +15,7 @@ class Endpoint:
 
 @dataclasses.dataclass
 class Config:
+    available_servers: list[str] = None
     server: str = None
     endpoint: Endpoint = None
 
@@ -55,7 +56,7 @@ def get_available_servers(protocol, host, port):
 
 
 @Debug.decorator
-def get_server_from_args(args) -> str:
+def get_servers_from_args(args) -> str:
     Debug.info(f"{args=}")
     if args.file:
         Debug.info(f"{args.file=}")
@@ -81,9 +82,7 @@ def get_server_from_args(args) -> str:
     servers = get_available_servers(protocol, host, port)
     Debug.info(f"{servers=}")
 
-    server = get_working_server(servers)
-    Debug.info(f"{server=}")
-    return server
+    return servers
 
 
 @Debug.decorator
@@ -106,10 +105,16 @@ def parse_arguments() -> Config:
     parser.add_argument("-f", "--file", help="reads config from file", )
 
     args = parser.parse_args()
-    server = get_server_from_args(args)
-
     config = Config()
+
+    servers = get_servers_from_args(args)
+    Debug.info(f"{servers=}")
+    config.available_servers = servers
+
+    server = get_working_server(servers)
+    Debug.info(f"{server=}")
     config.server = server
+
     # config.endpoint = Endpoint()
     CONFIG = config
     return config
