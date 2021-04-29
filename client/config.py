@@ -2,6 +2,7 @@ import json
 import sys
 import argparse
 import dataclasses
+import requests
 import util.network
 from client.debug import Debug
 
@@ -14,14 +15,43 @@ class Endpoint:
 
 @dataclasses.dataclass
 class Config:
-    server: str = None
+    servers: list[str] = None
     endpoint: Endpoint = None
 
 
-IPADDRESS = util.network.get_ipaddress()
+CONFIG = None
 
 
-def get_server_from_args(args) -> str:
+# IPADDRESS = util.network.get_ipaddress()
+
+def get_working_server(servers):
+    workingserver = None
+    for server in servers:
+        home = f"{server}/"
+        try:
+            response = requests.get(home)
+            response.raise_for_status()
+            workingserver = server
+        except Exception:
+            continue
+    return server
+
+
+def get_available_servers(protocol, host, port):
+    servers = []
+    if not host:
+        ips = util.network.get_localips()
+        for host in ips:
+            server = f"{protocol}://{host}:{port}"
+            servers.append(server)
+    else:
+        server = f"{protocol}://{host}:{port}"
+        servers.append(server)
+
+    return servers
+
+
+def get_servers_from_args(args) -> list[str]:
     Debug.info(f"{args=}")
     if args.file:
         Debug.info(f"{args.file=}")
@@ -32,20 +62,21 @@ def get_server_from_args(args) -> str:
                 config: dict = json.load(fp)
                 Debug.info("config content:", config)
                 protocol = config.get("protocol", "http")
-                host = config.get("host", IPADDRESS)
                 port = config.get("port", 5000)
-                server = f"{protocol}://{host}:{port}"
-                Debug.info(f"SERVER from {args.file}: {server}")
+                host = config.get("host")
+
+                # Debug.info(f"SERVERS from {args.file}: {servers}")
         except FileNotFoundError as e:
             Debug.error(f"file '{args.file}' not found")
             raise SystemExit()
     else:
         protocol = args.protocol or "http"
-        host = args.address or util.network.get_ipaddress()
         port = args.port or 5000
-    server = f"{protocol}://{host}:{port}"
-    Debug.info(f"{server=}")
-    return server
+        host = args.address
+
+    servers = get_available_servers(protocol, host, port)
+    Debug.info(f"{servers=}")
+    return servers
 
 
 def parse_arguments() -> Config:
@@ -66,10 +97,10 @@ def parse_arguments() -> Config:
     parser.add_argument("-f", "--file", help="reads config from file", )
 
     args = parser.parse_args()
-    server = get_server_from_args(args)
+    servers = get_servers_from_args(args)
 
     config = Config()
-    config.server = server
+    config.servers = servers
     # config.endpoint = Endpoint()
     CONFIG = config
     return config

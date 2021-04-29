@@ -14,7 +14,8 @@ def get_localips():
         if not stat.isup:
             continue
 
-        nics = [nic for nic in addresses[addr] if nic.family == socket.AF_INET and nic.netmask == "255.255.255.0"]
+        nics = [nic for nic in addresses[addr]
+                if (nic.family == socket.AF_INET and nic.netmask == "255.255.255.0") or nic.address == "127.0.0.1" ]
         for nic in nics:
             ips.append(nic.address)
     return ips
@@ -77,6 +78,6 @@ def get_ipaddress():
 
 if __name__ == '__main__':
     # list_adapters()
-    # list_ifs()
-    # print(80 * "-")
+    list_ifs()
+    print(80 * "-")
     print(get_localips())
