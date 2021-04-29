@@ -13,7 +13,7 @@ if not __package__:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from debug import Debug
-    from config import get_servers_from_args, parse_arguments
+    from config import parse_arguments
 else:
     """
     importing this script from another script
@@ -24,7 +24,7 @@ else:
     parentimport.parent_import()
     # parentimport.show_syspath()
     from .debug import Debug  # ok
-    from .config import get_servers_from_args, parse_arguments
+    from .config import parse_arguments
 
 import util.network
 
