@@ -2,3 +2,4 @@
 /.idea/
 cafes.db
 server.json
+__pycache__
